@@ -4,8 +4,8 @@ import openai
 from openai import OpenAI
 import datetime
 import matplotlib.pyplot as plt
+import japanize_matplotlib # 日本語化のためのライブラリをインポート
 import matplotlib.font_manager as fm
-# 例: Macの場合（ヒラギノ角ゴ）
 plt.rcParams['font.family'] = 'Hiragino Maru Gothic Pro'
 import numpy as np
 
