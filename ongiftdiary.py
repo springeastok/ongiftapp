@@ -5,6 +5,8 @@ from openai import OpenAI
 import datetime
 import matplotlib.pyplot as plt
 import japanize_matplotlib # 日本語化のためのライブラリをインポート
+import matplotlib.font_manager as fm
+plt.rcParams['font.family'] = 'Noto Sans Japanese' # フォントをNoto Sans Japaneseに設定
 import numpy as np
 
 import os # OSが持つ環境変数OPENAI_API_KEYにAPIを入力するためにosにアクセスするためのライブラリをインポート
