@@ -109,7 +109,9 @@ def build_content_inputs(mode):
  # 恩の相手の名前と関係性を入力
     person_name = st.sidebar.text_input("恩の相手の名前", placeholder="相手の名前")
     relationship = selectbox_with_others("恩の相手との関係(選択式)", ["友人", "家族", "恋人", "同僚", "上司", "先輩", "後輩", "部下", "恩師"])
-    
+    gender = selectbox_with_others("恩の相手の性別(選択式)", ["男性", "女性"])
+    age = selectbox_with_others("恩の相手の年齢(選択式)", ["10代", "20代", "30代", "40代", "50代", "60代", "70代以上"])
+
     # 名前と関係性を統合
     if person_name and relationship:
         combined_person_info = f"『{relationship}』である『{person_name}』"
