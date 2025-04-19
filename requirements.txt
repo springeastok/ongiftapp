@@ -1,5 +1,6 @@
 streamlit
 openai
 matplotlib
+japanize_matplotlib
 numpy
 python-dotenv
