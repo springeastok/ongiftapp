@@ -1,5 +1,5 @@
 streamlit
 openai
-python-dotenv
 matplotlib
 numpy
+python-dotenv
