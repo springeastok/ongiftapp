@@ -1,23 +1,79 @@
 # -*- coding: utf-8 -*-
 import streamlit as st
+
+# ↓↓↓↓↓ ここにマルチページ機能を追加 ↓↓↓↓↓
+st.set_page_config(page_title="diary", page_icon="")
+
 import openai
-from openai import OpenAI
+import sqlite3
 import datetime
 import matplotlib.pyplot as plt
 import japanize_matplotlib # 日本語化のためのライブラリをインポート
 import numpy as np
 
 import os # OSが持つ環境変数OPENAI_API_KEYにAPIを入力するためにosにアクセスするためのライブラリをインポート
+# ↓↓↓↓↓ ここにテーブル作成機能を追加 ↓↓↓↓↓
+base_dir = os.path.dirname(os.path.abspath(__file__))
+relative_path = os.path.join("data", "on_data.db")
+db_path = os.path.join(base_dir, relative_path)
+os.makedirs(os.path.dirname(db_path), exist_ok=True)
+
+
+def init_db():
+    conn = sqlite3.connect(db_path)
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS ondata (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            gender TEXT,
+            birth_date TEXT,
+            lifestyle TEXT,
+            date TEXT,
+            mode TEXT,
+            person_name TEXT,
+            relationship TEXT,
+            person_gender TEXT,
+            person_age TEXT,
+            kinds TEXT,
+            scene TEXT,
+            detail TEXT,
+            emotion TEXT,
+            level INTEGER,
+            ureP_level INTEGER,
+            distance INTEGER,
+            return_date TEXT,
+            return_idea TEXT,
+            output1 INTEGER,
+            output2 INTEGER,
+            output3 INTEGER,
+            output4 INTEGER,
+            output5 INTEGER,
+            output6 TEXT,
+            output7 TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+# 起動時に実行
+init_db()
+
 import dotenv # .envファイルを読み込むためのライブラリをインポート
 from dotenv import load_dotenv
+
 load_dotenv() # .envファイルを読み込むためのライブラリをインポート
 # アクセスの為のキーをopenai.api_keyに代入し、設定
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+
 api_key = os.getenv("OPENAI_API_KEY")
 
-os.environ["OPENAI_API_KEY"] = api_key # 環境変数OPENAI_API_KEYにAPIを代入 
-
+from openai import OpenAI
 # openAIの機能をclientに代入
 client = OpenAI()
+api_key = os.getenv("OPENAI_API_KEY")
+os.environ["OPENAI_API_KEY"] = api_key # 環境変数OPENAI_API_KEYにAPIを代入 
+
 
 # アプリのタイトルを設定
 st.title("恩 Gift Diary")
@@ -257,6 +313,80 @@ if st.sidebar.button("ダイアリーとスコアを表示"):
 
         # chatGPTにリクエストするためのメソッドを設定
         output_content_text = run_gpt(content_text_to_gpt, content_kind_of_to_gpt, content_maxStr_to_gpt)
+
+        # 【ここから保存用変数の定義】
+        name_val = st.session_state.user_info.get("name", "")
+        gender_val = st.session_state.user_info.get("gender", "")
+        birth_date_val = st.session_state.user_info.get("birth_date", datetime.date(2000,1,1)).strftime('%Y-%m-%d')
+        lifestyle_val = st.session_state.user_info.get("lifestyle", "")
+        date_val = content_date_to_gpt.strftime('%Y-%m-%d')
+        mode_val = radio_select
+
+        # 恩の相手に関する情報（すでに入力欄で使ってるのでst.session_stateからは取得不可）
+        # 入力した内容を変数化
+        person_name_val = st.sidebar.text_input("相手の名前（保存用）", "")
+        relationship_val = st.sidebar.text_input("相手との関係（保存用）", "")
+        person_gender_val = st.sidebar.text_input("相手の性別（保存用）", "")
+        person_age_val = st.sidebar.text_input("相手の年齢（保存用）", "")
+
+        # content_text_to_gpt_list から取得（modeごとに処理）
+        offset = 1 if person_name_val or relationship_val else 0
+        kinds_val = content_text_to_gpt_list[offset]
+        scene_val = content_text_to_gpt_list[offset + 1]
+        detail_val = content_text_to_gpt_list[offset + 2]
+        emotion_val = content_text_to_gpt_list[offset + 3]
+        return_date_val = ""
+        return_idea_val = ""
+
+        if mode_val == "受けた恩":
+            return_idea_val = content_text_to_gpt_list[offset + 4]
+            return_date_obj = st.session_state.get("恩返し予定日", datetime.date.today())
+            return_date_val = return_date_obj.strftime('%Y-%m-%d')
+
+        level_val = st.sidebar.slider("保存用 感情レベル", 1, 5, 3)
+        ureP_level_val = st.sidebar.slider("保存用 嬉P度", 1, 5, 3)
+        distance_val = st.sidebar.slider("保存用 心のキョリ好影響度", 1, 5, 3)
+
+        output1_val = st.sidebar.slider("保存用 感動度", 1, 10, 5)
+        output2_val = st.sidebar.slider("保存用 影響度", 1, 10, 5)
+        output3_val = st.sidebar.slider("保存用 心情的つながり", 1, 10, 5)
+        output4_val = st.sidebar.slider("保存用 お返ししたい気持ち", 1, 10, 5)
+        output5_val = st.sidebar.slider("保存用 距離感の変化", 1, 10, 5)
+
+        output6_val = output_content_text
+        output7_val = ""  # 画像未対応のため空欄
+
+        # ↓↓↓↓↓ ここに保存処理を追加 ↓↓↓↓↓
+        try:
+            conn = sqlite3.connect(db_path)
+            c = conn.cursor()
+            c.execute('''
+                INSERT INTO ondata (
+                    name, gender, birth_date, lifestyle,
+                    date, mode, person_name, relationship, person_gender, person_age,
+                    kinds, scene, detail, emotion,
+                    level, ureP_level, distance,
+                    return_date, return_idea,
+                    output1, output2, output3, output4, output5,
+                    output6, output7
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                name_val, gender_val, birth_date_val, lifestyle_val,
+                content_date_to_gpt.strftime("%Y-%m-%d"),
+                mode_val, person_name_val, relationship_val, person_gender_val, person_age_val,
+                kinds_val, scene_val, detail_val, emotion_val,
+                level_val, ureP_level_val, distance_val,
+                return_date_val, return_idea_val,
+                output1_val, output2_val, output3_val, output4_val, output5_val,
+                output6_val, output7_val
+            ))
+            conn.commit()
+            conn.close()
+            st.success("データベースに保存されました！")
+        except Exception as e:
+            st.error(f"保存時にエラーが発生しました: {e}")
+        # ↑↑↑↑↑ ここまでが保存処理 ↑↑↑↑↑
 
         # ダイアリーのタイトルを抽出（例: 最初の行をタイトルとする）
         diary_title = output_content_text.split("\n")[0] if "\n" in output_content_text else "生成されたタイトル"
