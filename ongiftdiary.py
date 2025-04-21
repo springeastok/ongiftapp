@@ -44,6 +44,9 @@ def init_db():
             distance INTEGER,
             return_date TEXT,
             return_idea TEXT,
+            gift_name TEXT,
+            gift_feature TEXT,
+            gift_price TEXT,
             output1 INTEGER,
             output2 INTEGER,
             output3 INTEGER,
@@ -391,6 +394,9 @@ if st.sidebar.button("ダイアリーとスコアを表示"):
         emotion_val = content_text_to_gpt_list[offset + 3]
         return_date_val = ""
         return_idea_val = ""
+        gift_name_val = ""
+        gift_feature_val = ""   
+        gift_price_val = ""
 
         if mode_val == "受けた恩":
             return_idea_val = content_text_to_gpt_list[offset + 4]
@@ -423,18 +429,18 @@ if st.sidebar.button("ダイアリーとスコアを表示"):
                     date, mode, person_name, relationship, person_gender, person_age,
                     kinds, scene, detail, emotion,
                     level, ureP_level, distance,
-                    return_date, return_idea,
+                    return_date, return_idea,gift_name, gift_feature, gift_price,
                     output1, output2, output3, output4, output5,
                     output6, output7
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 name_val, gender_val, birth_date_val, lifestyle_val,
                 content_date_to_gpt.strftime("%Y-%m-%d"),
                 mode_val, person_name_val, relationship_val, person_gender_val, person_age_val,
                 kinds_val, scene_val, detail_val, emotion_val,
                 level_val, ureP_level_val, distance_val,
-                return_date_val, return_idea_val,
+                return_date_val, return_idea_val,gift_name_val, gift_feature_val, gift_price_val,
                 output1_val, output2_val, output3_val, output4_val, output5_val,
                 output6_val, output7_val
             ))
