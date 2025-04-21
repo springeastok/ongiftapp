@@ -578,36 +578,36 @@ if candidates:
 
     # 手入力オプションを表示
     st.markdown("### 候補を参考に入力してください")
-    custom_name = st.text_input(
+    gift_name = st.text_input(
         "商品名", 
-        value=st.session_state.get("custom_name", ""), 
-        key="custom_name"
+        value=st.session_state.get("gift_name", ""), 
+        key="gift_name"
     )
-    custom_features = st.text_area(
+    gift_features = st.text_area(
         "特徴", 
-        value=st.session_state.get("custom_features", ""), 
-        key="custom_features"
+        value=st.session_state.get("gift_features", ""), 
+        key="gift_features"
     )
-    custom_price = st.text_input(
+    gift_price = st.text_input(
         "おおよその小売価格（円）", 
-        value=st.session_state.get("custom_price", ""), 
-        key="custom_price"
+        value=st.session_state.get("gift_price", ""), 
+        key="gift_price"
     )
 
     # 入力内容をセッション状態に保存
-    if custom_name != st.session_state.get("custom_name", ""):
-        st.session_state["custom_name"] = custom_name
-    if custom_features != st.session_state.get("custom_features", ""):
-        st.session_state["custom_features"] = custom_features
-    if custom_price != st.session_state.get("custom_price", ""):
-        st.session_state["custom_price"] = custom_price
+    if gift_name != st.session_state.get("gift_name", ""):
+        st.session_state["gift_name"] = gift_name
+    if gift_features != st.session_state.get("gift_features", ""):
+        st.session_state["gift_features"] = gift_features
+    if gift_price != st.session_state.get("gift_price", ""):
+        st.session_state["gift_price"] = gift_price
 
     # 入力完了ボタン
     if st.button("入力完了"):
         selected_summary = {
-            "商品名": custom_name if custom_name else "未入力",
-            "特徴": custom_features if custom_features else "未入力",
-            "おおよその小売価格": custom_price if custom_price else "未入力"
+            "商品名": gift_name if gift_name else "未入力",
+            "特徴": gift_features if gift_features else "未入力",
+            "おおよその小売価格": gift_price if gift_price else "未入力"
         }
         st.write("以下の内容が入力されました：")
         st.json(selected_summary)
