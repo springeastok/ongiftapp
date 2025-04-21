@@ -9,10 +9,9 @@ import os
 from datetime import datetime, timedelta
 
 # データベースパスの設定（スクリプトの上の方に置く）
-base_dir = os.path.dirname(os.path.abspath(__file__))
-relative_path = os.path.join("data", "on_data.db")
-db_path = os.path.join(base_dir, relative_path)
-os.makedirs(os.path.dirname(db_path), exist_ok=True)
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+db_path = os.path.join(base_dir, "data", "on_data.db") 
+#os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
 
 # SQLiteに接続する　#ときゅさんの新規追加分は一旦””で囲む
@@ -20,22 +19,35 @@ def init_db():
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS ondata(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        "name" 
-        "gender"
-        "birth_date"
-        "lifestyle"
-        "person_name"
-        "gender
-        date TEXT,
-        relationship TEXT,
-        scene TEXT,
-        detail BLOB,
-        things TEXT,
-        price INTEGER,
-        return_value TEXT
-              )''')
-    
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT,
+                gender TEXT,
+                birth_date TEXT,
+                lifestyle TEXT,
+                date TEXT,
+                mode TEXT,
+                person_name TEXT,
+                relationship TEXT,
+                person_gender TEXT,
+                person_age TEXT,
+                kinds TEXT,
+                scene TEXT,
+                detail TEXT,
+                emotion TEXT,
+                level INTEGER,
+                ureP_level INTEGER,
+                distance INTEGER,
+                return_date TEXT,
+                return_idea TEXT,
+                output1 INTEGER,
+                output2 INTEGER,
+                output3 INTEGER,
+                output4 INTEGER,
+                output5 INTEGER,
+                output6 TEXT,
+                output7 TEXT
+        )
+    ''')
     conn.commit()
     conn.close()
 
@@ -55,7 +67,7 @@ def load_events_from_db():
     c = conn.cursor()
     
     # テーブルから全データ取得
-    c.execute("SELECT id, date, relationship, scene, detail FROM ondata")
+    c.execute("SELECT id, name, gender, birth_date, lifestyle,date, mode, person_name, relationship, person_gender, person_age,kinds, scene, detail, emotion,level, ureP_level, distance,return_date, return_idea,output1, output2, output3, output4, output5,output6, output7 FROM ondata")
     rows = c.fetchall()
     conn.close()
 
@@ -88,25 +100,44 @@ cal = st_calendar.calendar(events = event_list ,options = calendar_options)
 
 def load_data():
     conn = sqlite3.connect(db_path)
-    df = pd.read_sql('SELECT id, date, relationship,scene,detail,things,price,return_value FROM ondata',conn)
+    df = pd.read_sql('SELECT id, name, gender, birth_date, lifestyle,date, mode, person_name, relationship, person_gender, person_age,kinds, scene, detail, emotion,level, ureP_level, distance,return_date, return_idea,output1, output2, output3, output4, output5,output6, output7 FROM ondata',conn)
     conn.close()
 
     # カラム名の変更
     df = df.rename(columns={
         'id': 'No',
+        'name': '名前',
+        'gender': '性別',
+        'birth_date': '誕生日',
+        'lifestyle': 'ライフスタイル',
         'date': '日付',
+        'mode': 'モード',
+        'person_name': '相手の名前',
         'relationship': '関係',
+        'person gender': '相手の性別',
+        'person_age': '相手の年齢',
+        'kinds': '種類',
         'scene': 'シーン',
         'detail': '詳細',
-        'things': '物',
-        'price': '金額',
-        'return_value': 'お返し'
-    })
+        'emotion': '感情',
+        'level': 'レベル',
+        'ureP_level': 'うれPレベル',
+        'distance': '距離',
+        'return_date': 'お返し日',
+        'return_idea': 'お返しアイデア',
+        'output1': '出力1',
+        'output2': '出力2',
+        'output3': '出力3',
+        'output4': '出力4',
+        'output5': '出力5',
+        'output6': '出力6',
+        'output7': '出力7'
+        })
 
     return df
     
 init_db() 
-st.subheader("恩の一覧")
+st.subheader("恩一覧")
 
 df = load_data()
 #インデックス番号を削除　→　ID表示に変更。
@@ -131,13 +162,13 @@ def fetch_ondata():
     conn.close()
     return result
 
-def insert_ondata(date, relationship, scene, detail, things, price, return_value):
+def insert_ondata(date, relationship, scene, detail):
     try:
         conn = sqlite3.connect(db_path)
         c = conn.cursor()
         c.execute(
-            "INSERT INTO ondata(date, relationship, scene, detail, things, price, return_value) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (date, relationship, scene, detail, things, price, return_value)
+            "INSERT INTO ondata(date, relationship, scene, detail,) VALUES (?, ?, ?, ?)",
+            (date, relationship, scene, detail)
         )
         conn.commit()
         conn.close()
@@ -145,19 +176,3 @@ def insert_ondata(date, relationship, scene, detail, things, price, return_value
         st.error(f"データ追加中にエラーが発生しました: {e}")
 
 
-# 入力フォーム
-st.subheader("恩入力")
-new_date = st.date_input("日付", datetime.now())
-new_relationship = st.selectbox("関係", ["家族", "友人", "恋人", "上司"]) 
-new_scene = st.text_input("シーン")
-new_detail = st.text_area("詳細")
-new_things = st.text_input("物品")
-new_price = st.number_input("金額", min_value=0, step=100000)
-new_return_value = st.text_input("お返し")
-
-# フォームが送信されたらデータベースに新しい恩を挿入
-if st.button("追加"):
-    insert_ondata(new_date, new_relationship, new_scene, new_detail, new_things, new_price, new_return_value)
-    st.success("恩データが追加されました！")
-
-    

@@ -107,7 +107,7 @@ st.sidebar.write(f"生年月日: {st.session_state.user_info['birth_date']}")
 st.sidebar.write(f"ライフスタイル: {st.session_state.user_info['lifestyle']}")
 
 # chatGPTにリクエストするためのメソッドを設定
-def run_gpt(content_text_to_GPT, content_kind_of_to_gpt, content_maxStr_to_gpt):
+def run_gpt(content_text_to_gpt, content_kind_of_to_gpt, content_maxStr_to_gpt,person_name_val, relationship_val, person_gender_val, person_age_val,emotion_level, ureP_level, distance_level):
     # content_date_to_gptを文字列に変換
     content_date_to_gpt_str = content_date_to_gpt.strftime("%Y-%m-%d")
 
@@ -120,15 +120,23 @@ def run_gpt(content_text_to_GPT, content_kind_of_to_gpt, content_maxStr_to_gpt):
         f"ライフスタイル: {st.session_state.user_info['lifestyle']}\n"
     )
 
+    # スコア情報を追加
+    score_info = (
+        f"感情レベル: {emotion_level}\n"
+        f"嬉P度: {ureP_level}\n"
+        f"キョリ影響度: {distance_level}\n"
+    )
+
     # リクエスト文を作成
     request_to_gpt = (
         "以下の内容を基にダイアリーを作成してください。\n"
         + user_info
         + "日付: " + content_date_to_gpt_str + "\n"
         + "タイトルをつけてください。\n"
-        + "内容: " + content_text_to_GPT + "\n"
+        + "内容: " + content_text_to_gpt + "\n"
         + "文体: " + content_kind_of_to_gpt + "\n"
         + "文字数: " + content_maxStr_to_gpt + "文字以内\n"
+        + score_info
     )
 
     # OpenAI APIへのリクエスト
@@ -161,11 +169,11 @@ def build_content_inputs(mode):
     content_text_to_gpt_array = []
     content_text_to_gpt_list = []
 
- # 恩の相手の名前と関係性を入力
+# 恩の相手の名前と関係性を入力
     person_name = st.sidebar.text_input("恩の相手の名前", placeholder="相手の名前")
     relationship = selectbox_with_others("恩の相手との関係(選択式)", ["友人", "家族", "恋人", "同僚", "上司", "先輩", "後輩", "部下", "恩師"])
-    gender = selectbox_with_others("恩の相手の性別(選択式)", ["男性", "女性"])
-    age = selectbox_with_others("恩の相手の年齢(選択式)", ["10代", "20代", "30代", "40代", "50代", "60代", "70代以上"])
+    person_gender = selectbox_with_others("恩の相手の性別(選択式)", ["男性", "女性"])
+    person_age = selectbox_with_others("恩の相手の年齢(選択式)", ["10代", "20代", "30代", "40代", "50代", "60代", "70代以上"])
 
     # 名前と関係性を統合
     if person_name and relationship:
@@ -186,9 +194,9 @@ def build_content_inputs(mode):
         content_text_to_gpt_list.append(st.sidebar.text_input("具体的な内容について書いてください", placeholder="具体的な内容(フリー記述)"))
         content_text_to_gpt_list.append(selectbox_with_others("恩に対する感情/特に強く感じた気持ちを選んでください", ["感謝", "驚き", "喜び", "感動", "興奮", "親しみ","期待", "戸惑い", "安心", "恥ずかしさ", "申し訳なさ"]))
         # 恩の感情レベルをスライドバーで表示する
-        content_maxStr_to_gpt = str(st.sidebar.slider('恩の感情レベル：その気持ちの感じかたの主観的強さを記録', 1,5,10))
-        content_maxStr_to_gpt = str(st.sidebar.slider('嬉P度：その気持ちに加えて自分が感じた主観的な「嬉しさ」の度合いを記録', 1,5,10))
-        content_maxStr_to_gpt = str(st.sidebar.slider('心のキョリ好影響度：相手との関係への主観的な好影響度合いを記録', 1,5,10))
+        emotion_level = st.sidebar.slider('恩の感情レベル：その気持ちの感じかたの主観的強さを記録', 1,10,5)
+        ureP_level = st.sidebar.slider('嬉P度：その気持ちに加えて自分が感じた主観的な「嬉しさ」の度合いを記録', 1,10,5)
+        distance_level = st.sidebar.slider('心のキョリ好影響度：相手との関係への主観的な好影響度合いを記録', 1,10,5)
         st.sidebar.date_input('恩返し予定日', datetime.date.today())
         content_text_to_gpt_list.append(selectbox_with_others("恩返し案(選択式)", ["物や食べ物をプレゼント", "言葉をかける", "時間や労力をかける", "経済的なお返しをする"]))
 
@@ -198,27 +206,49 @@ def build_content_inputs(mode):
         content_text_to_gpt_list.append(st.sidebar.text_input("具体的な内容について書いてください", placeholder="具体的な内容(フリー記述)"))
         content_text_to_gpt_list.append(st.sidebar.text_input("恩のシチュエーション／恩返しの機会", placeholder="恩返しの機会(フリー記述)"))
         content_text_to_gpt_list.append(selectbox_with_others("恩の感情/特に強く感じた気持ちを選んでください", ["感謝", "喜び", "感動", "興奮", "親しみ", "安心", "期待", "戸惑い", "安心", "恥ずかしさ", "申し訳なさ"]))
-        content_maxStr_to_gpt = str(st.sidebar.slider('恩の感情レベル：その気持ちの感じかたの主観的強さを記録', 1,5,10))
-        content_maxStr_to_gpt = str(st.sidebar.slider('嬉P度：その気持ちに加えて自分が感じた主観的な「嬉しさ」の度合いを記録', 1,5,10))
-        content_maxStr_to_gpt = str(st.sidebar.slider('心のキョリ好影響度：相手との関係への主観的n好影響度合いを記録', 1,5,10))
+        emotion_level = st.sidebar.slider('恩の感情レベル：その気持ちの感じかたの主観的強さを記録', 1,10,5)
+        ureP_level = st.sidebar.slider('嬉P度：その気持ちに加えて自分が感じた主観的な「嬉しさ」の度合いを記録', 1,10,5)
+        distance_level = st.sidebar.slider('心のキョリ好影響度：相手との関係への主観的な好影響度合いを記録', 1,10,5)
     
     else:  # mode == "送った恩"
         content_text_to_gpt_list.append(selectbox_with_others("恩の種類(選択式)", ["物や食べ物をプレゼント", "言葉をかける", "時間や労力をかける", "経済的に負担をする"]))
         content_text_to_gpt_list.append(st.sidebar.text_input("具体的な内容について書いてください", placeholder="具体的な内容(フリー記述)"))
         content_text_to_gpt_list.append(st.sidebar.text_input("恩のシチュエーション／機会", placeholder="恩を送る機会(フリー記述)"))
         content_text_to_gpt_list.append(selectbox_with_others("恩の感情/特に強く感じた気持ちを選んでください", ["感謝", "喜び", "感動", "興奮", "親しみ", "安心", "期待", "戸惑い", "安心", "恥ずかしさ", "申し訳なさ"]))
-        content_maxStr_to_gpt = str(st.sidebar.slider('恩の感情レベル：その気持ちの感じかたの主観的強さを記録', 1,5,10))
-        content_maxStr_to_gpt = str(st.sidebar.slider('嬉P度：その気持ちに加えて自分が感じた主観的な「嬉しさ」の度合いを記録', 1,5,10))
-        content_maxStr_to_gpt = str(st.sidebar.slider('心のキョリ好影響度：相手との関係への主観的な好影響度合いを記録', 1,5,10))
+        emotion_level = st.sidebar.slider('恩の感情レベル：その気持ちの感じかたの主観的強さを記録', 1,10,5)
+        ureP_level = st.sidebar.slider('嬉P度：その気持ちに加えて自分が感じた主観的な「嬉しさ」の度合いを記録', 1,10,5)
+        distance_level = st.sidebar.slider('心のキョリ好影響度：相手との関係への主観的な好影響度合いを記録', 1,10,5)
     
-    return content_text_to_gpt, content_text_to_gpt_array, content_text_to_gpt_list
+    return (
+        content_text_to_gpt,
+        content_text_to_gpt_array,
+        content_text_to_gpt_list,
+        person_name,
+        relationship,
+        person_gender,
+        person_age,
+        emotion_level,
+        ureP_level,
+        distance_level
+    )
 
 # ラジオボタンでモード選択
 select_box = ["受けた恩", "返した恩", "送った恩"]
 radio_select = st.sidebar.radio("恩の方向", select_box)
 
 # 入力UIの表示
-content_text_to_gpt, content_text_to_gpt_array, content_text_to_gpt_list = build_content_inputs(radio_select)
+(
+    content_text_to_gpt,
+    content_text_to_gpt_array,
+    content_text_to_gpt_list,
+    person_name_val,
+    relationship_val,
+    person_gender_val,
+    person_age_val,
+    level_val,
+    ureP_level_val,
+    distance_level_val
+) = build_content_inputs(radio_select)
 
 # 入力された配列から空欄を排除し、content_text_to_gpt_arrayに代入
 content_text_to_gpt_array = []  # 初期化を確認
@@ -276,7 +306,7 @@ else:
 st.sidebar.write("文章のスタイル：", custom_style)
 
 # chatGPTに出力させる文字数をスライドバーで表示する
-content_maxStr_to_gpt = str(st.sidebar.slider('ダイアリーの最大文字数', 100,500,1000))
+content_maxStr_to_gpt = str(st.sidebar.slider('ダイアリーの最大文字数', 100,1000,500))
 
 # エラーが起きたときに表示するための箱をサイドバーに用意する
 warning_text = st.sidebar.empty()
@@ -301,33 +331,57 @@ def plot_radar_chart(scores, labels, title="スコア分析"):
     ax.set_title(title, size=16, color="black", pad=20)
 
     return fig
+
 # ダイアリーの生成とスコアの可視化を同時に行う
 if st.sidebar.button("ダイアリーとスコアを表示"):
     # ダイアリーの内容（例として固定のテキストを使用）
     diary_content = "恩を感じた出来事を自動で文章化します。"
 
     # 無駄にリクエストしないように書かせたい内容に中身があるか確認し、あれば実行
-    if (content_text_to_gpt != ""):
+    if content_text_to_gpt != "":
         output_content.write("ダイアリー生成中")  # 状況案内を表示
         warning_text.write("")  # 正常に実行されているので、エラーを書き込む箱を空欄書き込みでリセット処理
 
         # chatGPTにリクエストするためのメソッドを設定
-        output_content_text = run_gpt(content_text_to_gpt, content_kind_of_to_gpt, content_maxStr_to_gpt)
+        output_content_text = run_gpt(
+            content_text_to_gpt,
+            content_kind_of_to_gpt,
+            content_maxStr_to_gpt,
+            person_name_val,
+            relationship_val,
+            person_gender_val,
+            person_age_val,
+            level_val,
+            ureP_level_val,
+            distance_level_val
+        )
 
-        # 【ここから保存用変数の定義】
+
+        # ダイアリーのタイトルを抽出（例: 最初の行をタイトルとする）
+        diary_title = output_content_text.split("\n")[0] if "\n" in output_content_text else "生成されたタイトル"
+        
+        # 恩の日付をタイトルに追加
+        diary_title_with_date = f"{content_date_to_gpt.strftime('%Y-%m-%d')} - {diary_title}"
+
+        # スコアの初期化と保存
+        st.session_state.generated_diary = output_content_text
+        st.session_state.generated_title = diary_title_with_date
+
+        # スコアの初期値（保存）
+        st.session_state.output_scores = {
+            "感動度": 7,
+            "影響度": 5,
+            "距離感の変化": 4,
+            "お返ししたい気持ち": 6,
+            "心情的つながり": 9
+        }
+                # 【ここから保存用変数の定義】
         name_val = st.session_state.user_info.get("name", "")
         gender_val = st.session_state.user_info.get("gender", "")
         birth_date_val = st.session_state.user_info.get("birth_date", datetime.date(2000,1,1)).strftime('%Y-%m-%d')
         lifestyle_val = st.session_state.user_info.get("lifestyle", "")
         date_val = content_date_to_gpt.strftime('%Y-%m-%d')
         mode_val = radio_select
-
-        # 恩の相手に関する情報（すでに入力欄で使ってるのでst.session_stateからは取得不可）
-        # 入力した内容を変数化
-        person_name_val = st.sidebar.text_input("相手の名前（保存用）", "")
-        relationship_val = st.sidebar.text_input("相手との関係（保存用）", "")
-        person_gender_val = st.sidebar.text_input("相手の性別（保存用）", "")
-        person_age_val = st.sidebar.text_input("相手の年齢（保存用）", "")
 
         # content_text_to_gpt_list から取得（modeごとに処理）
         offset = 1 if person_name_val or relationship_val else 0
@@ -343,15 +397,18 @@ if st.sidebar.button("ダイアリーとスコアを表示"):
             return_date_obj = st.session_state.get("恩返し予定日", datetime.date.today())
             return_date_val = return_date_obj.strftime('%Y-%m-%d')
 
-        level_val = st.sidebar.slider("保存用 感情レベル", 1, 5, 3)
-        ureP_level_val = st.sidebar.slider("保存用 嬉P度", 1, 5, 3)
-        distance_val = st.sidebar.slider("保存用 心のキョリ好影響度", 1, 5, 3)
+        #level_val = st.sidebar.slider("感情レベル", 1, 5, 3)
+        #ureP_level_val = st.sidebar.slider("嬉P度", 1, 5, 3)
+        #distance_val = st.sidebar.slider("心のキョリ好影響度", 1, 5, 3)
+        level_val = level_val
+        ureP_level_val = ureP_level_val
+        distance_val = distance_level_val
 
-        output1_val = st.sidebar.slider("保存用 感動度", 1, 10, 5)
-        output2_val = st.sidebar.slider("保存用 影響度", 1, 10, 5)
-        output3_val = st.sidebar.slider("保存用 心情的つながり", 1, 10, 5)
-        output4_val = st.sidebar.slider("保存用 お返ししたい気持ち", 1, 10, 5)
-        output5_val = st.sidebar.slider("保存用 距離感の変化", 1, 10, 5)
+        output1_val = st.session_state.output_scores["感動度"] #st.sidebar.slider("保存用 感動度", 1, 10, 5)
+        output2_val = st.session_state.output_scores["影響度"] #st.sidebar.slider("保存用 影響度", 1, 10, 5)
+        output3_val = st.session_state.output_scores["心情的つながり"] #st.sidebar.slider("保存用 心情的つながり", 1, 10, 5)
+        output4_val = st.session_state.output_scores["お返ししたい気持ち"] #st.sidebar.slider("保存用 お返ししたい気持ち", 1, 10, 5)
+        output5_val = st.session_state.output_scores["距離感の変化"] #st.sidebar.slider("保存用 距離感の変化", 1, 10, 5)
 
         output6_val = output_content_text
         output7_val = ""  # 画像未対応のため空欄
@@ -381,52 +438,75 @@ if st.sidebar.button("ダイアリーとスコアを表示"):
                 output1_val, output2_val, output3_val, output4_val, output5_val,
                 output6_val, output7_val
             ))
+            # 🔽 lastrowid を session_state に保存
+            st.session_state.generated_id = c.lastrowid
+
             conn.commit()
             conn.close()
             st.success("データベースに保存されました！")
+            
         except Exception as e:
             st.error(f"保存時にエラーが発生しました: {e}")
         # ↑↑↑↑↑ ここまでが保存処理 ↑↑↑↑↑
+else:
+    warning_text.write("恩情報が不足しています")  # 書かせたい内容がないので、エラーとして表示
 
-        # ダイアリーのタイトルを抽出（例: 最初の行をタイトルとする）
-        diary_title = output_content_text.split("\n")[0] if "\n" in output_content_text else "生成されたタイトル"
-        
-        # 恩の日付をタイトルに追加
-        diary_title_with_date = f"{content_date_to_gpt.strftime('%Y-%m-%d')} - {diary_title}"
 
-        # ダイアリーの内容を表示
-        st.write("生成ダイアリー")
-        st.write(diary_content)  # 固定のテキスト
-        st.write(content_date_to_gpt.strftime('%Y-%m-%d'))
-        st.write(output_content_text)  # 生成されたダイアリーを表示
 
-        # 編集可能なテキストエリアを表示
-        st.write("生成されたダイアリーを編集してください:")
-        editable_content = st.text_area("編集可能なダイアリー", value=output_content_text, height=300)
+# 生成済みの場合の表示（リロード防止 & スライダー編集可能）
+if "generated_diary" in st.session_state:
+    st.subheader("生成ダイアリー")
+    st.write(st.session_state.generated_title)
+    st.write(st.session_state.generated_diary)
 
-        # 編集後の内容をダウンロードするボタンを設置
-        st.download_button(
-            label='Download',
-            data=editable_content,
-            file_name='edited_output.txt',
-            mime='text/plain',
-        )
-    else:
-        warning_text.write("恩情報が不足しています")  # 書かせたい内容がないので、エラーとして表示
-
-    # サンプルスコア（実際には入力データから計算）
-    scores = [
-        int(st.sidebar.slider("影響度", 1, 10, 5)),
-        int(st.sidebar.slider("感動度", 1, 10, 7)),
-        int(st.sidebar.slider("距離感の変化", 1, 10, 6)),
-        int(st.sidebar.slider("お返ししたい気持ち", 1, 10, 8)),
-        int(st.sidebar.slider("心情的繋がりの強さ", 1, 10, 9))
-    ]
-    labels = ["影響度", "感動度", "距離感の変化", "お返ししたい気持ち", "心情的繋がりの強さ"]
-
-    # レーダーチャートを描画
-    radar_chart = plot_radar_chart(scores, labels, title=diary_title_with_date)
+    st.subheader("保存用スコアの調整")
+    for key in st.session_state.output_scores:
+        st.session_state.output_scores[key] = st.sidebar.slider(f"{key}", 1, 10, st.session_state.output_scores[key])
+    
+    
+    # チャート描画
+    scores = list(st.session_state.output_scores.values())
+    labels = list(st.session_state.output_scores.keys())
+    radar_chart = plot_radar_chart(scores, labels, title=st.session_state.generated_title)
 
     # スコア分析を縦に表示
     st.subheader("感動チャート")
     st.pyplot(radar_chart)
+
+    # 編集可能なテキストエリアを表示
+    st.write("生成されたダイアリーを編集してください:")
+    editable_content = st.text_area("編集可能なダイアリー", st.session_state.generated_diary, height=300)
+
+    # 編集後の内容をダウンロードするボタンを設置
+    if st.download_button(
+        label='更新してダウンロード',
+        data=editable_content,
+        file_name='edited_output.txt',
+        mime='text/plain',
+        ):
+
+        if "generated_id" in st.session_state:
+            try:    
+                conn = sqlite3.connect(db_path)
+                c = conn.cursor()
+                c.execute('''
+                    UPDATE ondata SET
+                        output1 = ?, output2 = ?, output3 = ?, output4 = ?, output5 = ?, output6 = ?
+                    WHERE id = ?
+                ''', (
+                    st.session_state.output_scores["感動度"],
+                    st.session_state.output_scores["影響度"],
+                    st.session_state.output_scores["心情的つながり"],
+                    st.session_state.output_scores["お返ししたい気持ち"],
+                    st.session_state.output_scores["距離感の変化"],
+                    editable_content,
+                    st.session_state.generated_id
+                ))
+                conn.commit()
+                conn.close()
+                st.success("スコアと内容をデータベースに上書き保存しました！")
+            except Exception as e:
+                st.error(f"更新エラー: {e}")
+        else:
+            st.warning("データベースに保存されたIDが見つかりません。再度「ダイアリーとスコアを表示」から始めてください。")
+
