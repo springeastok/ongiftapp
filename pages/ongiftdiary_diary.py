@@ -64,6 +64,7 @@ def load_events_from_db():
     conn.close()
     return df
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 df = load_events_from_db()
 
@@ -72,6 +73,8 @@ query_params = st.query_params
 selected_id = int(query_params.get("selected_id", [0])[0])
 =======
 >>>>>>> d7f3022d6e5d7a043fa0781fc26b9b550d5ffee8
+=======
+>>>>>>> 704f77a38995b90601c55db9be247690b71738a0
 
 df = load_events_from_db()
 
@@ -83,6 +86,7 @@ selected_id = int(query_params.get("selected_id", [0])[0])
 st.title('Diary')
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 def generate_color(mode, output1):
     base_colors = {
@@ -92,6 +96,8 @@ def generate_color(mode, output1):
     }
 
 =======
+=======
+>>>>>>> 704f77a38995b90601c55db9be247690b71738a0
 #with st.sidebar:
 #    st.header("表示設定")
 #    selectable_columns = df.columns.drop(["id", "date"])  # IDや日付そのものは除く
@@ -106,7 +112,10 @@ def generate_color(mode, output1):
         "送った恩": (255, 193, 7)   # オレンジベース
     }
 
+<<<<<<< HEAD
 >>>>>>> d7f3022d6e5d7a043fa0781fc26b9b550d5ffee8
+=======
+>>>>>>> 704f77a38995b90601c55db9be247690b71738a0
     r, g, b = base_colors.get(mode, (108, 117, 125))  # fallback: グレー
 
     try:
