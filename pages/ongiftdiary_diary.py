@@ -70,10 +70,15 @@ df = load_events_from_db()
 query_params = st.query_params
 selected_id = int(query_params.get("selected_id", [0])[0])
 
-
 #タイトル
 st.title('Diary')
 
+#with st.sidebar:
+#    st.header("表示設定")
+#    selectable_columns = df.columns.drop(["id", "date"])  # IDや日付そのものは除く
+#    display_column = st.selectbox("カレンダーに表示したいカラム", selectable_columns)
+
+# --- FullCalendar 用データを生成 ---
 
 def generate_color(mode, output1):
     base_colors = {
