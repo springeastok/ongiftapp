@@ -330,8 +330,8 @@ def plot_radar_chart(scores, labels, title="スコア分析"):
 
     # プロットの設定
     fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(polar=True))
-    ax.fill(angles, scores, color='blue', alpha=0.25)
-    ax.plot(angles, scores, color='blue', linewidth=2)
+    ax.fill(angles, scores, color='orange', alpha=0.25)
+    ax.plot(angles, scores, color='orange', linewidth=2)
     ax.set_yticks([2, 4, 6, 8, 10])  # スコアの目盛り
     ax.set_yticklabels(["2", "4", "6", "8", "10"], color="gray", size=8)
     ax.set_xticks(angles[:-1])
@@ -522,8 +522,8 @@ if "generated_diary" in st.session_state:
 cloud_name = os.getenv("CLOUDINARY_NAME")
 upload_preset = os.getenv("CLOUDINARY_PRESET")
 
-st.subheader("🎁頂きもの画像解析🎁")
-st.write("画像をアップロードすると、その商品が何かを推測して5つの候補を表示します。")
+st.subheader("🎁頂きもの画像解析")
+st.write("下の枠から画像をアップロードするとその商品が何かを推測して5つの候補を表示します")
 
 # 画像アップロード
 uploaded_file = st.file_uploader("画像をアップロード", type=["jpg", "jpeg", "png"])
