@@ -9,49 +9,46 @@ import sqlite3
 import os
 from datetime import datetime, timedelta
 
-# データベースパスの設定（スクリプトの上の方に置く）
+# データベースパスの設定
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 db_path = os.path.join(base_dir, "data", "on_data.db") 
-#os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
-
-# SQLiteに接続する　#ときゅさんの新規追加分は一旦””で囲む
+# SQLiteに接続
 def init_db():
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS ondata(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT,
-                gender TEXT,
-                birth_date TEXT,
-                lifestyle TEXT,
-                date TEXT,
-                mode TEXT,
-                person_name TEXT,
-                relationship TEXT,
-                person_gender TEXT,
-                person_age TEXT,
-                kinds TEXT,
-                scene TEXT,
-                detail TEXT,
-                emotion TEXT,
-                level INTEGER,
-                ureP_level INTEGER,
-                distance INTEGER,
-                return_date TEXT,
-                return_idea TEXT,
-                gift_name TEXT,
-                gift_feature TEXT,
-                gift_price TEXT,
-                output1 INTEGER,
-                output2 INTEGER,
-                output3 INTEGER,
-                output4 INTEGER,
-                output5 INTEGER,
-                output6 TEXT,
-                output7 TEXT
-        )
-    ''')
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        gender TEXT,
+        birth_date TEXT,
+        lifestyle TEXT,
+        date TEXT,
+        mode TEXT,
+        person_name TEXT,
+        relationship TEXT,
+        person_gender TEXT,
+        person_age TEXT,
+        kinds TEXT,
+        scene TEXT,
+        detail TEXT,
+        emotion TEXT,
+        level INTEGER,
+        ureP_level INTEGER,
+        distance INTEGER,
+        return_date TEXT,
+        return_idea TEXT,
+        gift_name TEXT,
+        gift_feature TEXT,
+        gift_price TEXT,
+        output1 INTEGER,
+        output2 INTEGER,
+        output3 INTEGER,
+        output4 INTEGER,
+        output5 INTEGER,
+        output6 TEXT,
+        output7 TEXT
+    )''')
     conn.commit()
     conn.close()
 
@@ -63,18 +60,6 @@ def load_events_from_db():
     df = pd.read_sql("SELECT * FROM ondata", conn)
     conn.close()
     return df
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-df = load_events_from_db()
-
-# --- URLから選択されたイベントのIDを取得 ---
-query_params = st.query_params
-selected_id = int(query_params.get("selected_id", [0])[0])
-=======
->>>>>>> d7f3022d6e5d7a043fa0781fc26b9b550d5ffee8
-=======
->>>>>>> 704f77a38995b90601c55db9be247690b71738a0
 
 df = load_events_from_db()
 
@@ -82,12 +67,10 @@ df = load_events_from_db()
 query_params = st.query_params
 selected_id = int(query_params.get("selected_id", [0])[0])
 
-#タイトル
+# タイトル
 st.title('Diary')
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-
+# --- カラー関数 ---
 def generate_color(mode, output1):
     base_colors = {
         "受けた恩": (0, 123, 255),   # 青ベース
@@ -95,27 +78,6 @@ def generate_color(mode, output1):
         "送った恩": (255, 193, 7)   # オレンジベース
     }
 
-=======
-=======
->>>>>>> 704f77a38995b90601c55db9be247690b71738a0
-#with st.sidebar:
-#    st.header("表示設定")
-#    selectable_columns = df.columns.drop(["id", "date"])  # IDや日付そのものは除く
-#    display_column = st.selectbox("カレンダーに表示したいカラム", selectable_columns)
-
-# --- FullCalendar 用データを生成 ---
-
-def generate_color(mode, output1):
-    base_colors = {
-        "受けた恩": (0, 123, 255),   # 青ベース
-        "与えた恩": (40, 167, 69),  # 緑ベース
-        "送った恩": (255, 193, 7)   # オレンジベース
-    }
-
-<<<<<<< HEAD
->>>>>>> d7f3022d6e5d7a043fa0781fc26b9b550d5ffee8
-=======
->>>>>>> 704f77a38995b90601c55db9be247690b71738a0
     r, g, b = base_colors.get(mode, (108, 117, 125))  # fallback: グレー
 
     try:
@@ -126,20 +88,19 @@ def generate_color(mode, output1):
     alpha = 0.2 + (min(max(level, 1), 10) / 10) * 0.6  # alphaは0.2〜0.8
     return f"rgba({r},{g},{b},{alpha:.2f})"
 
+# --- FullCalendar 用データを生成 ---
 events = []
 for _, row in df.iterrows():
-    if row["date"]:  # dateが空じゃないときのみ
+    if row["date"]:
         color = generate_color(row["mode"], row["output1"])
         
-        # タイトル構築
         title_parts = [
             str(row["person_name"]) if row["person_name"] else "",
             str(row["scene"]) if row["scene"] else "",
             str(row["emotion"]) if row["emotion"] else ""
         ]
-        title = "｜".join(filter(None, title_parts))  # 空文字は省く
-        
-        
+        title = "｜".join(filter(None, title_parts))
+
         event = {
             "title": title,
             "start": row["date"],
@@ -194,7 +155,7 @@ calendar_html = f"""
         if (info.event.extendedProps.id === selectedId) {{
           info.el.classList.add("highlight-event");
         }}
-      }}  // ← ← ← ここで正しく閉じてる！
+      }}
     }});
     calendar.render();
   }});
@@ -209,14 +170,12 @@ if selected_id:
     highlight_df = df[df["id"] == selected_id]
     st.dataframe(highlight_df.style.applymap(lambda x: "background-color: yellow", subset=pd.IndexSlice[:, :]))
 
-
-#DFを利用して一覧を表示
+# --- 一覧データ読込 ---
 def load_data():
     conn = sqlite3.connect(db_path)
-    df = pd.read_sql('SELECT id, name, gender, birth_date, lifestyle,date, mode, person_name, relationship, person_gender, person_age,kinds, scene, detail, emotion,level, ureP_level, distance,return_date, return_idea,gift_name,gift_feature,gift_price,output1, output2, output3, output4, output5,output6, output7 FROM ondata',conn)
+    df = pd.read_sql('SELECT id, name, gender, birth_date, lifestyle,date, mode, person_name, relationship, person_gender, person_age,kinds, scene, detail, emotion,level, ureP_level, distance,return_date, return_idea,gift_name,gift_feature,gift_price,output1, output2, output3, output4, output5,output6, output7 FROM ondata', conn)
     conn.close()
 
-    # カラム名の変更
     df = df.rename(columns={
         'id': 'No',
         'name': '名前',
@@ -248,47 +207,37 @@ def load_data():
         'output5': '出力5',
         'output6': '出力6',
         'output7': '出力7'
-        })
-
+    })
     return df
-    
-init_db() 
+
 st.subheader("恩一覧")
 
-
 df = load_data()
-#インデックス番号を削除　→　ID表示に変更。
 
-# --- 一覧表示（該当行を緑でハイライト） ---
 def highlight_row(row):
     if row.name == selected_id:
         return ["background-color: lightgreen"] * len(row)
     else:
         return [""] * len(row)
+
 st.dataframe(df.set_index("No").style.apply(highlight_row, axis=1))
 
-
-#ここからはテスト用。。実際はときゅさんの入力より反映。#################################################
-
-
-# データ取得
+# --- テスト用のINSERT関数 ---
 def fetch_ondata():
     conn = sqlite3.connect(db_path)
     df = pd.read_sql_query("SELECT * FROM ondata", conn)
     conn.close()
-    return df  # ← これでOK
+    return df
 
 def insert_ondata(date, relationship, scene, detail):
     try:
         conn = sqlite3.connect(db_path)
         c = conn.cursor()
         c.execute(
-            "INSERT INTO ondata(date, relationship, scene, detail,) VALUES (?, ?, ?, ?)",
+            "INSERT INTO ondata(date, relationship, scene, detail) VALUES (?, ?, ?, ?)",
             (date, relationship, scene, detail)
         )
         conn.commit()
         conn.close()
     except Exception as e:
         st.error(f"データ追加中にエラーが発生しました: {e}")
-
-

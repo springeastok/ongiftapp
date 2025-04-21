@@ -74,7 +74,6 @@ from dotenv import load_dotenv
 load_dotenv() # .envファイルを読み込むためのライブラリをインポート
 # アクセスの為のキーをopenai.api_keyに代入し、設定
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-
 api_key = os.getenv("OPENAI_API_KEY")
 
 from openai import OpenAI
