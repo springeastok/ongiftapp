@@ -63,6 +63,15 @@ def load_events_from_db():
     df = pd.read_sql("SELECT * FROM ondata", conn)
     conn.close()
     return df
+<<<<<<< HEAD
+
+df = load_events_from_db()
+
+# --- URLから選択されたイベントのIDを取得 ---
+query_params = st.query_params
+selected_id = int(query_params.get("selected_id", [0])[0])
+=======
+>>>>>>> d7f3022d6e5d7a043fa0781fc26b9b550d5ffee8
 
 df = load_events_from_db()
 
@@ -70,10 +79,10 @@ df = load_events_from_db()
 query_params = st.query_params
 selected_id = int(query_params.get("selected_id", [0])[0])
 
-
 #タイトル
 st.title('Diary')
 
+<<<<<<< HEAD
 
 def generate_color(mode, output1):
     base_colors = {
@@ -82,6 +91,22 @@ def generate_color(mode, output1):
         "送った恩": (255, 193, 7)   # オレンジベース
     }
 
+=======
+#with st.sidebar:
+#    st.header("表示設定")
+#    selectable_columns = df.columns.drop(["id", "date"])  # IDや日付そのものは除く
+#    display_column = st.selectbox("カレンダーに表示したいカラム", selectable_columns)
+
+# --- FullCalendar 用データを生成 ---
+
+def generate_color(mode, output1):
+    base_colors = {
+        "受けた恩": (0, 123, 255),   # 青ベース
+        "与えた恩": (40, 167, 69),  # 緑ベース
+        "送った恩": (255, 193, 7)   # オレンジベース
+    }
+
+>>>>>>> d7f3022d6e5d7a043fa0781fc26b9b550d5ffee8
     r, g, b = base_colors.get(mode, (108, 117, 125))  # fallback: グレー
 
     try:
